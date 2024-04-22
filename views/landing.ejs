@@ -30,7 +30,9 @@
             const response = await fetch('/location/all');
             const locations = await response.json();
             locations.forEach(loc => {
-                L.polygon(loc.coordinates, {
+                // Reverse each coordinate pair
+                const reversedCoordinates = loc.coordinates.map(coord => [coord[1], coord[0]]);
+                L.polygon(reversedCoordinates, {
                     color: 'blue'
                 }).bindPopup(`<strong>${loc.name}</strong><br/>${loc.description}`).addTo(map);
             });
