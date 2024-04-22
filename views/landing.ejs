@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
-    <!-- Include Leaflet.js CSS and JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- CSS for full-screen map -->
+    <title>View Locations</title>
+    <!-- Include Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <style>
         html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden;
         }
         #map {
             width: 100%;
@@ -22,31 +19,36 @@
     </style>
 </head>
 <body>
-
-<!-- Map container -->
 <div id="map"></div>
 
-<!-- Script to initialize the map and add data areas -->
+<!-- Include Leaflet.js JavaScript -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    // Initialize map with center at Sri Lanka
-    var map = L.map('map').setView([7.8731, 80.7718], 8); // Centered at Colombo, Sri Lanka (latitude, longitude, zoom level)
+    // Function to load and display locations
+    async function loadLocations() {
+        try {
+            const response = await fetch('/location/all');
+            const locations = await response.json();
+            locations.forEach(loc => {
+                L.polygon(loc.coordinates, {
+                    color: 'blue'
+                }).bindPopup(`<strong>${loc.name}</strong><br/>${loc.description}`).addTo(map);
+            });
+        } catch (error) {
+            console.error('Error loading locations:', error);
+        }
+    }
 
-    // Add a tile layer (e.g., OpenStreetMap)
+    // Initialize map and add base layer
+    var map = L.map('map').setView([7.8731, 80.7718], 8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Sample data area (polygon)
-    var sampleArea = [
-        [7.8731, 80.7718], // Colombo
-        [6.9271, 79.8612], // Kandy
-        [9.6615, 80.0255], // Trincomalee
-        [6.9275, 79.8484]  // Galle
-    ];
-
-    // Add the sample area (polygon) to the map
-    L.polygon(sampleArea, { color: 'blue' }).addTo(map);
+    // Call the function to load and display locations
+    loadLocations();
 </script>
+
 </body>
 </html>

@@ -10,6 +10,8 @@ const indexRoutes = require('./routes/index');
 const mapRoutes = require('./routes/map');
 const User = require('./models/User');
 const locationAddRoutes = require('./routes/location'); // Import the locationAdd routes
+const cors = require('cors');
+
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mapSatelliteApp';
 // Load environment variables from .env file
@@ -39,7 +41,9 @@ app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUniniti
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(cors());  // This will allow all CORS requests. For production, configure it to allow only certain origins.
 // Routes
 app.use('/', indexRoutes); // Main routes (landing page, etc.)
 app.use('/auth', authRoutes); // Authentication routes
