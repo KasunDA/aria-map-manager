@@ -1,20 +1,52 @@
-// routes/auth.js
 const express = require('express');
-const passport = require('../config/passport'); // Import Passport configuration
+const passport = require('passport');
+const User = require('../models/User');
+
 const router = express.Router();
 
-router.get('/login', (req, res) => {
-    // Check if there is a flash message stored in the session
-    const message = req.flash('error')[0]; // Assuming you're using connect-flash for flash messages
-
-    res.render('login', { message }); // Pass the message variable to the login view
+// Signup route
+router.get('/signup', (req, res) => {
+    res.render('signup', { message: req.flash('error') }); // Pass the 'error' flash message
 });
 
-// Login post route (handle form submission)
+router.post('/signup', async (req, res) => {
+    const { email, password, confirmPassword } = req.body;
+    if (password !== confirmPassword) {
+        req.flash('error', 'Passwords do not match');
+        return res.redirect('/auth/signup');
+    }
+    try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            req.flash('error', 'Email is already registered');
+            return res.redirect('/auth/signup');
+        }
+        const newUser = new User({ email, password });
+        await newUser.save();
+        req.flash('success', 'Account created successfully');
+        res.redirect('/auth/login');
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Something went wrong');
+        res.redirect('/auth/signup');
+    }
+});
+
+// Login route
+router.get('/login', (req, res) => {
+    res.render('login'); // Render the login form
+});
+
 router.post('/login', passport.authenticate('local', {
-    successRedirect: '/', // Redirect to homepage if login is successful
-    failureRedirect: '/auth/login', // Redirect back to login page if authentication fails
-    failureFlash: true // Enable flash messages for error handling
+    successRedirect: '/dashboard',
+    failureRedirect: '/auth/login',
+    failureFlash: true
 }));
+
+// Logout route
+router.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
 
 module.exports = router;

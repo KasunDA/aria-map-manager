@@ -1,28 +1,38 @@
-const passport = require('passport');
+// ./config/passport.js
+
 const LocalStrategy = require('passport-local').Strategy;
-const Admin = require('../models/Admin'); // Admin model (similar to User model)
+const bcrypt = require('bcryptjs');
+const User = require('../models/User');
 
-passport.use('admin-local', new LocalStrategy((username, password, done) => {
-    Admin.findOne({ username: username }, (err, admin) => {
-        if (err) { return done(err); }
-        if (!admin) {
-            return done(null, false, { message: 'Incorrect username.' });
+module.exports = function(passport) {
+    passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+        try {
+            const user = await User.findOne({ email });
+            if (!user) {
+                return done(null, false, { message: 'Incorrect email.' });
+            }
+
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return done(null, false, { message: 'Incorrect password.' });
+            }
+
+            return done(null, user);
+        } catch (err) {
+            return done(err);
         }
-        if (!admin.validPassword(password)) {
-            return done(null, false, { message: 'Incorrect password.' });
+    }));
+
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
+    });
+
+    passport.deserializeUser(async (id, done) => {
+        try {
+            const user = await User.findById(id);
+            done(null, user);
+        } catch (err) {
+            done(err);
         }
-        return done(null, admin);
     });
-}));
-
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-    Admin.findById(id, (err, admin) => {
-        done(err, admin);
-    });
-});
-
-module.exports = passport;
+};
