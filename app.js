@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const indexRoutes = require('./routes/index');
 const mapRoutes = require('./routes/map');
 const User = require('./models/User');
+const locationAddRoutes = require('./routes/location'); // Import the locationAdd routes
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/mapSatelliteApp';
 // Load environment variables from .env file
@@ -43,6 +44,8 @@ app.use(flash());
 app.use('/', indexRoutes); // Main routes (landing page, etc.)
 app.use('/auth', authRoutes); // Authentication routes
 app.use('/map', mapRoutes); // Map-related routes
+app.use('/location', locationAddRoutes); // Map-related routes
+
 
 // Handle 404 - Not Found
 app.use((req, res, next) => {
