@@ -27,8 +27,8 @@
 
 <!-- Script to initialize the map and add data areas -->
 <script>
-    // Initialize map
-    var map = L.map('map').setView([51.505, -0.09], 13);
+    // Initialize map with center at Sri Lanka
+    var map = L.map('map').setView([7.8731, 80.7718], 8); // Centered at Colombo, Sri Lanka (latitude, longitude, zoom level)
 
     // Add a tile layer (e.g., OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -38,10 +38,10 @@
 
     // Sample data area (polygon)
     var sampleArea = [
-        [51.509, -0.08],
-        [51.503, -0.06],
-        [51.51, -0.047],
-        [51.514, -0.057]
+        [7.8731, 80.7718], // Colombo
+        [6.9271, 79.8612], // Kandy
+        [9.6615, 80.0255], // Trincomalee
+        [6.9275, 79.8484]  // Galle
     ];
 
     // Add the sample area (polygon) to the map
