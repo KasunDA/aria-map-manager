@@ -34,7 +34,7 @@
                 const reversedCoordinates = loc.coordinates.map(coord => [coord[1], coord[0]]);
                 L.polygon(reversedCoordinates, {
                     color: 'blue'
-                }).bindPopup(`<strong>${loc.name}</strong><br/>${loc.description}`).addTo(map);
+                }).bindPopup(`<strong>${loc.name}</strong><br/>${loc.description}<br/>${loc.squareFeet} sq ft`).addTo(map);
             });
         } catch (error) {
             console.error('Error loading locations:', error);
