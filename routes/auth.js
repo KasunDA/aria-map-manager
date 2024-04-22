@@ -10,7 +10,8 @@ router.get('/signup', (req, res) => {
 });
 
 router.post('/signup', async (req, res) => {
-    const { email, password, confirmPassword } = req.body;
+    const { username,email, password, confirmPassword } = req.body;
+
     if (password !== confirmPassword) {
         req.flash('error', 'Passwords do not match');
         return res.redirect('/auth/signup');
@@ -21,7 +22,7 @@ router.post('/signup', async (req, res) => {
             req.flash('error', 'Email is already registered');
             return res.redirect('/auth/signup');
         }
-        const newUser = new User({ email, password });
+        const newUser = new User({ username,email, password });
         await newUser.save();
         req.flash('success', 'Account created successfully');
         res.redirect('/auth/login');
@@ -34,7 +35,7 @@ router.post('/signup', async (req, res) => {
 
 // Login route
 router.get('/login', (req, res) => {
-    res.render('login'); // Render the login form
+    res.render('login', { message: req.flash('error') }); // Pass the 'error' flash message
 });
 
 router.post('/login', passport.authenticate('local', {
